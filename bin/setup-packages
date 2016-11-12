@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+#
+# (c) 2016, PJ$ <me@pjstein.co>
+# Bits & Peace
+#
+# bin/setup-packages
+#
+
+# Constants --------------------------------------------------------------------
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+RESOURCES="$DIR/../resources"
+
+# Start ------------------------------------------------------------------------
+sudo apt-get update
+
+# Install Global Packages ------------------------------------------------------
+echo ""
+echo "Installing packages..."
+echo ""
+
+sudo apt-get install -y  \
+  build-essential        \
+  git-core               \
+  python-pip             \
+  python-dev             \
+  fail2ban
+
+# Configure iptables -----------------------------------------------------------
+echo ""
+echo "Configuring iptables..."
+
+RULES_NAME="iptables.rules"
+sudo cp $RESOURCES/$RULES_NAME /etc/$RULES_NAME
+sudo iptables-restore < /etc/$RULES_NAME
+
+sudo sh -c 'echo "#!/usr/bin/env sh
+/sbin/iptables-restore < /etc/iptables.firewall.rules
+" > /etc/network/if-pre-up.d/firewall'
+sudo chmod +x /etc/network/if-pre-up.d/firewall
+
+# Configure fail2ban -----------------------------------------------------------
+echo ""
+echo "Configuring fail2ban..."
+
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+sudo service fail2ban restart

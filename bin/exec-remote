@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+#
+# (c) 2016, PJ$ <me@pjstein.co>
+# Bits & Peace
+#
+# bin/exec-remote
+#
+
+# Constants --------------------------------------------------------------------
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+ROOT="$DIR/.."
+
+# Args -------------------------------------------------------------------------
+REMOTE=$1
+COMMAND=$2
+
+# Prepare ----------------------------------------------------------------------
+rsync                    \
+  --verbose              \
+  --progress             \
+  --stats                \
+  --compress             \
+  --recursive            \
+  --exclude ".git"       \
+  --exclude ".gitignore" \
+  $ROOT/*                \
+  $REMOTE:~/automation
+
+# Execute ----------------------------------------------------------------------
+ssh $REMOTE << EOF
+  cd ~/automation/bin
+  ./$COMMAND
+EOF
