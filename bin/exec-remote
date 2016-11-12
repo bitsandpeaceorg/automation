@@ -17,6 +17,7 @@ COMMAND=$2
 
 # Prepare ----------------------------------------------------------------------
 rsync                    \
+  --rsh `which ssh`      \
   --verbose              \
   --progress             \
   --stats                \
